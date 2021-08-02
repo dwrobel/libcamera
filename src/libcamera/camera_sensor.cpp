@@ -197,7 +197,6 @@ int CameraSensor::validateSensorDriver()
 			LOG(CameraSensor, Warning)
 				<< "Recommended V4L2 control " << utils::hex(ctrl)
 				<< " not supported";
-			err = -EINVAL;
 		}
 	}
 
