@@ -3,14 +3,17 @@
 %global date     20210728
 %forgemeta
 
+%global the_udev_rule_file 50-dma_heap.rules
+
 Name:    libcamera
 Version: 0.0.0
-Release: 0.4%{?snapshot:.%{snapshot}}%{?dist}
+Release: 0.5%{?snapshot:.%{snapshot}}%{?dist}
 Summary: A library to support complex camera ISPs
 # Libarary is LGPLv2.1+ and the cam tool is GPLv2
 License: LGPLv2.1+ and GPLv2
 URL:     http://libcamera.org/
 Source0: %{forgesource}
+Source1: %{name}-dma_heap.rules
 # Reported as https://github.com/raspberrypi/linux/issues/4500
 Patch0:  libcamera-Do-not-return-EINVAL-for-missing-recommended-ioctl.patch
 
@@ -39,8 +42,12 @@ BuildRequires: pkgconfig(Qt5Gui)
 BuildRequires: pkgconfig(Qt5Widgets)
 BuildRequires: pkgconfig(gstreamer-video-1.0)
 BuildRequires: pkgconfig(gstreamer-allocators-1.0)
+# For the %%_udevrulesdir macro
+BuildRequires: systemd
 
 Requires:      qt5-qtbase-gui
+# For the directory
+Requires:       systemd-udev
 
 %description
 libcamera is a library that deals with heavy hardware image processing operations
@@ -107,15 +114,20 @@ export CXXFLAGS="%{optflags} -Wno-deprecated-declarations"
 
 %install
 %meson_install
-
-%ldconfig_scriptlets
-
-%ldconfig_scriptlets ipa
+install -D -p -m 644 %{SOURCE1} \
+    %{buildroot}%{_udevrulesdir}/%{the_udev_rule_file}
 
 %files
 %license COPYING.rst LICENSES/
 %{_libdir}/libcamera*.so
 %{_libdir}/v4l2-compat.so
+%{_udevrulesdir}/%{the_udev_rule_file}
+
+%post
+%udev_rules_update
+
+%postun
+%udev_rules_update
 
 %files devel
 %{_includedir}/%{name}/
@@ -141,6 +153,10 @@ export CXXFLAGS="%{optflags} -Wno-deprecated-declarations"
 %{_bindir}/lc-compliance
 
 %changelog
+* Mon Aug 02 2021 Damian Wrobel <dwrobel@ertelnet.rybnik.pl> - 0.0.0-0.5
+- Add udev rule to adjust access to dma_heap files
+- Remove ldconfig_scriptlets
+
 * Mon Aug 02 2021 Damian Wrobel <dwrobel@ertelnet.rybnik.pl> - 0.0.0-0.4
 - Add patch to not return EINVAL on unsupported ioctls on Raspberry Pi
 
