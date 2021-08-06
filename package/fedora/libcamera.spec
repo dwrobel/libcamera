@@ -1,21 +1,19 @@
 %global forgeurl https://github.com/libcamera-org/libcamera
-%global commit   b40a8d4b454008aeab4c0eb1f63a07083d7d7c74
-%global date     20210728
+%global commit   abaa45d627122205e838b1bd1f8c621efba2bbb0
+%global date     20210805
 %forgemeta
 
 %global the_udev_rule_file 50-dma_heap.rules
 
 Name:    libcamera
 Version: 0.0.0
-Release: 0.5%{?snapshot:.%{snapshot}}%{?dist}
+Release: 0.6%{?snapshot:.%{snapshot}}%{?dist}
 Summary: A library to support complex camera ISPs
 # Libarary is LGPLv2.1+ and the cam tool is GPLv2
 License: LGPLv2.1+ and GPLv2
 URL:     http://libcamera.org/
 Source0: %{forgesource}
 Source1: %{name}-dma_heap.rules
-# Reported as https://github.com/raspberrypi/linux/issues/4500
-Patch0:  libcamera-Do-not-return-EINVAL-for-missing-recommended-ioctl.patch
 
 BuildRequires: doxygen
 BuildRequires: /usr/bin/git
@@ -153,6 +151,10 @@ install -D -p -m 644 %{SOURCE1} \
 %{_bindir}/lc-compliance
 
 %changelog
+* Fri Aug 06 2021 Damian Wrobel <dwrobel@ertelnet.rybnik.pl> - 0.0.0-0.6
+- Update to the latest snapshot
+- Drop patch for issue fixed upstream
+
 * Mon Aug 02 2021 Damian Wrobel <dwrobel@ertelnet.rybnik.pl> - 0.0.0-0.5
 - Add udev rule to adjust access to dma_heap files
 - Remove ldconfig_scriptlets
